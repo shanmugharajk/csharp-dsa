@@ -1,20 +1,20 @@
 namespace DataStructuresAndAlgorithms.BinarySearchTree;
 
 // ReSharper disable once InconsistentNaming
-public class BST
+public class Bst
 {
     public int Value;
 
-    public BST? Left;
+    public Bst? Left;
 
-    public BST? Right;
+    public Bst? Right;
 
-    public BST(int value)
+    public Bst(int value)
     {
         this.Value = value;
     }
 
-    public BST Insert(int value)
+    public Bst Insert(int value)
     {
         var currentNode = this;
 
@@ -24,7 +24,7 @@ public class BST
             {
                 if (currentNode.Left == null)
                 {
-                    currentNode.Left = new BST(value);
+                    currentNode.Left = new Bst(value);
                     return this;
                 }
 
@@ -34,7 +34,7 @@ public class BST
             {
                 if (currentNode.Right == null)
                 {
-                    currentNode.Right = new BST(value);
+                    currentNode.Right = new Bst(value);
                     return this;
                 }
 
@@ -62,7 +62,7 @@ public class BST
         return false;
     }
 
-    public BST Remove(int value, BST? parent = null)
+    public Bst Remove(int value, Bst? parent = null)
     {
         // Finding the node, parent node
         var (node, parentNode) = this.ParentNodeAndNode(value);
@@ -118,12 +118,12 @@ public class BST
         return this;
     }
 
-    private (BST? node, BST? parentNode) ParentNodeAndNode(int value)
+    private (Bst? node, Bst? parentNode) ParentNodeAndNode(int value)
     {
-        BST? parentNode = null;
+        Bst? parentNode = null;
 
         // ReSharper disable once SuggestVarOrType_SimpleTypes
-        BST? currentNode = this;
+        Bst? currentNode = this;
 
         while (currentNode != null)
         {

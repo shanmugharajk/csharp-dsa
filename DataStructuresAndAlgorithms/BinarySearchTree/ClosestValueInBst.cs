@@ -2,7 +2,7 @@ namespace DataStructuresAndAlgorithms.BinarySearchTree;
 
 public abstract class ClosestValueInBst
 {
-    public static int FindClosestValueInBst(BST tree, int target)
+    public static int FindClosestValueInBst(Bst tree, int target)
     {
         var closetValue = tree.Value;
         var currentNode = tree;

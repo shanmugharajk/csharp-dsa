@@ -2,12 +2,12 @@ namespace DataStructuresAndAlgorithms.BinarySearchTree;
 
 public abstract class BstValidity
 {
-    public static bool IsValid(BST node)
+    public static bool IsValid(Bst node)
     {
         return IsValid(node, int.MinValue, int.MaxValue);
     }
 
-    private static bool IsValid(BST node, int minValue, int maxValue)
+    private static bool IsValid(Bst node, int minValue, int maxValue)
     {
         if (node.Value < minValue || node.Value >= maxValue)
         {
