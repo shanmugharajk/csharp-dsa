@@ -165,6 +165,48 @@ namespace DataStructuresAndAlgorithms.BinarySearchTree
             return closetValue;
         }
 
+        public static IList<TValue> GetKeysInOrder(BinarySearchTree<TValue>? node)
+        {
+            if (node is null)
+            {
+                return new List<TValue>();
+            }
+
+            var result = new List<TValue>();
+            result.AddRange(GetKeysInOrder(node.Left));
+            result.Add(node.Value);
+            result.AddRange(GetKeysInOrder(node.Right));
+            return result;
+        }
+
+        public static IList<TValue> GetKeysPreOrder(BinarySearchTree<TValue>? node)
+        {
+            if (node is null)
+            {
+                return new List<TValue>();
+            }
+
+            var result = new List<TValue>();
+            result.Add(node.Value);
+            result.AddRange(GetKeysPreOrder(node.Left));
+            result.AddRange(GetKeysPreOrder(node.Right));
+            return result;
+        }
+
+        public static IList<TValue> GetKeysPostOrder(BinarySearchTree<TValue>? node)
+        {
+            if (node is null)
+            {
+                return new List<TValue>();
+            }
+
+            var result = new List<TValue>();
+            result.AddRange(GetKeysPostOrder(node.Left));
+            result.AddRange(GetKeysPostOrder(node.Right));
+            result.Add(node.Value);
+            return result;
+        }
+
         private bool IsValid(BinarySearchTree<TValue> node, TValue minValue, TValue maxValue)
         {
             var leftComparisonResult = comparer.Compare(node.Value, minValue);

@@ -91,4 +91,55 @@ public class BinarySearchTreeTests
 
         Assert.That(root.FindClosestValueInBst(12), Is.EqualTo(13));
     }
+
+    [Test]
+    public void Return_InOrderTraversal_Correctly()
+    {
+        var root = new BinarySearchTree<int>(10);
+        root.Left = new BinarySearchTree<int>(5);
+        root.Left.Left = new BinarySearchTree<int>(2);
+        root.Left.Left.Left = new BinarySearchTree<int>(1);
+        root.Left.Right = new BinarySearchTree<int>(5);
+        root.Right = new BinarySearchTree<int>(15);
+        root.Right.Right = new BinarySearchTree<int>(22);
+
+        var actual = BinarySearchTree<int>.GetKeysInOrder(root);
+        var expected = new List<int>() { 1, 2, 5, 5, 10, 15, 22 };
+
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Return_PreOrderTraversal_Correctly()
+    {
+        var root = new BinarySearchTree<int>(10);
+        root.Left = new BinarySearchTree<int>(5);
+        root.Left.Left = new BinarySearchTree<int>(2);
+        root.Left.Left.Left = new BinarySearchTree<int>(1);
+        root.Left.Right = new BinarySearchTree<int>(5);
+        root.Right = new BinarySearchTree<int>(15);
+        root.Right.Right = new BinarySearchTree<int>(22);
+
+        var actual = BinarySearchTree<int>.GetKeysPreOrder(root);
+        var expected = new List<int>() { 10, 5, 2, 1, 5, 15, 22 };
+
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void Return_PostOrderTraversal_Correctly()
+    {
+        var root = new BinarySearchTree<int>(10);
+        root.Left = new BinarySearchTree<int>(5);
+        root.Left.Left = new BinarySearchTree<int>(2);
+        root.Left.Left.Left = new BinarySearchTree<int>(1);
+        root.Left.Right = new BinarySearchTree<int>(5);
+        root.Right = new BinarySearchTree<int>(15);
+        root.Right.Right = new BinarySearchTree<int>(22);
+
+        var actual = BinarySearchTree<int>.GetKeysPostOrder(root);
+        var expected = new List<int>() { 1, 2, 5, 5, 22, 15, 10 };
+
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
