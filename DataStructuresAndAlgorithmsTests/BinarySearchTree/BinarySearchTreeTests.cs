@@ -3,108 +3,72 @@ using NUnit.Framework;
 
 namespace DataStructuresAndAlgorithmsTests.BinarySearchTree;
 
-public class BinarySearchTreeTests
+public class BinarySearchTreeNewTests
 {
     [Test]
     public void UpdateExistingTree_Correctly_Forms_Tree()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Left = new BinarySearchTree<int>(13);
-        root.Right.Left.Right = new BinarySearchTree<int>(14);
-        root.Right.Right = new BinarySearchTree<int>(22);
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10, 5, 15, 2, 5, 13, 22, 1, 14});
 
-        root.Insert(12);
-        Assert.That(root.Right?.Left?.Left?.Value, Is.EqualTo(12));
+        tree.Insert(12);
+        Assert.That(tree.Root?.Right?.Left?.Left?.Value, Is.EqualTo(12));
 
-        root.Remove(10);
+        tree.Remove(10);
         Assert.Multiple(() =>
         {
-            Assert.That(root.Value, Is.EqualTo(12));
-            Assert.That(root.Contains(15), Is.EqualTo(true));
+            Assert.That(tree.Root?.Value, Is.EqualTo(12));
+            Assert.That(tree.Contains(15), Is.EqualTo(true));
         });
     }
 
     [Test]
     public void AddFromRoot_Creates_Valid_Tree()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Insert(5);
-        Assert.That(root.Left?.Value, Is.EqualTo(5));
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10});
+        tree.Insert(5);
+        Assert.That(tree.Root?.Left?.Value, Is.EqualTo(5));
 
-        root.Insert(15);
+        tree.Insert(15);
         Assert.Multiple(() =>
         {
-            Assert.That(root.Right?.Value, Is.EqualTo(15));
-            Assert.That(root.Contains(10), Is.EqualTo(true));
-            Assert.That(root.Contains(5), Is.EqualTo(true));
-            Assert.That(root.Contains(15), Is.EqualTo(true));
-            Assert.That(root.Contains(1), Is.EqualTo(false));
+            Assert.That(tree.Root?.Right?.Value, Is.EqualTo(15));
+            Assert.That(tree.Contains(10), Is.EqualTo(true));
+            Assert.That(tree.Contains(5), Is.EqualTo(true));
+            Assert.That(tree.Contains(15), Is.EqualTo(true));
+            Assert.That(tree.Contains(1), Is.EqualTo(false));
         });
 
-        root.Remove(5);
-        root.Remove(15);
+        tree.Remove(5);
+        tree.Remove(15);
         Assert.Multiple(() =>
         {
-            Assert.That(root.Contains(5), Is.EqualTo(false));
-            Assert.That(root.Contains(15), Is.EqualTo(false));
+            Assert.That(tree.Contains(5), Is.EqualTo(false));
+            Assert.That(tree.Contains(15), Is.EqualTo(false));
         });
 
-        // Removing root node which doesn't have any children.
-        // In this case the node will not be deleted.
-        root.Remove(10);
-        Assert.That(root.Value, Is.EqualTo(10));
+        tree.Remove(10);
+        Assert.That(tree.Root?.Value, Is.EqualTo(null));
     }
 
     [Test]
     public void ChecksValidityOfTree()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Left = new BinarySearchTree<int>(13);
-        root.Right.Left.Right = new BinarySearchTree<int>(14);
-        root.Right.Right = new BinarySearchTree<int>(22);
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10, 5, 15, 2, 5, 13, 22, 1, 14});
 
-        Assert.That(root.IsValid(), Is.EqualTo(true));
-    }
-
-    [Test]
-    public void FindClosestValueInBst_Correctly()
-    {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Left = new BinarySearchTree<int>(13);
-        root.Right.Left.Right = new BinarySearchTree<int>(14);
-        root.Right.Right = new BinarySearchTree<int>(22);
-
-        Assert.That(root.FindClosestValueInBst(12), Is.EqualTo(13));
+        Assert.That(tree.IsValid(), Is.EqualTo(true));
     }
 
     [Test]
     public void Return_InOrderTraversal_Correctly()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Right = new BinarySearchTree<int>(22);
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10, 5, 15, 2, 5, 22, 1});
 
-        var actual = BinarySearchTree<int>.GetKeysInOrder(root);
-        var expected = new List<int>() { 1, 2, 5, 5, 10, 15, 22 };
+        var actual = tree.GetValuesInOrder();
+        var expected = new List<int>() {1, 2, 5, 5, 10, 15, 22};
 
         Assert.That(actual, Is.EqualTo(expected));
     }
@@ -112,16 +76,11 @@ public class BinarySearchTreeTests
     [Test]
     public void Return_PreOrderTraversal_Correctly()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Right = new BinarySearchTree<int>(22);
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10, 5, 15, 2, 5, 22, 1});
 
-        var actual = BinarySearchTree<int>.GetKeysPreOrder(root);
-        var expected = new List<int>() { 10, 5, 2, 1, 5, 15, 22 };
+        var actual = tree.GetValuesPreOrder();
+        var expected = new List<int>() {10, 5, 2, 1, 5, 15, 22};
 
         Assert.That(actual, Is.EqualTo(expected));
     }
@@ -129,16 +88,11 @@ public class BinarySearchTreeTests
     [Test]
     public void Return_PostOrderTraversal_Correctly()
     {
-        var root = new BinarySearchTree<int>(10);
-        root.Left = new BinarySearchTree<int>(5);
-        root.Left.Left = new BinarySearchTree<int>(2);
-        root.Left.Left.Left = new BinarySearchTree<int>(1);
-        root.Left.Right = new BinarySearchTree<int>(5);
-        root.Right = new BinarySearchTree<int>(15);
-        root.Right.Right = new BinarySearchTree<int>(22);
+        var tree = new BinarySearchTree<int>();
+        tree.AddRange(new List<int>() {10, 5, 15, 2, 5, 22, 1});
 
-        var actual = BinarySearchTree<int>.GetKeysPostOrder(root);
-        var expected = new List<int>() { 1, 2, 5, 5, 22, 15, 10 };
+        var actual = tree.GetValuesPostOrder();
+        var expected = new List<int>() {1, 2, 5, 5, 22, 15, 10};
 
         Assert.That(actual, Is.EqualTo(expected));
     }

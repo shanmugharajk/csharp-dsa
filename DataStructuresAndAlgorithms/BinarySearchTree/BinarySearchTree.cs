@@ -1,269 +1,246 @@
-namespace DataStructuresAndAlgorithms.BinarySearchTree
+namespace DataStructuresAndAlgorithms.BinarySearchTree;
+
+public class BinarySearchTree<TValue>
 {
-    public class BinarySearchTree<TValue>
+    private readonly Comparer<TValue> comparer;
+
+    public BinarySearchTreeNode<TValue>? Root { get; private set; }
+
+    public BinarySearchTree()
     {
-        private readonly Comparer<TValue> comparer;
+        Root = null;
+        comparer = Comparer<TValue>.Default;
+    }
 
-        public TValue Value;
+    public BinarySearchTree(Comparer<TValue> customComparer)
+    {
+        Root = null;
+        comparer = customComparer;
+    }
 
-        public BinarySearchTree<TValue>? Left;
+    public bool Contains(TValue value) => Search(Root, value) is not null;
 
-        public BinarySearchTree<TValue>? Right;
+    public ICollection<TValue> GetValuesInOrder() => GetValuesInOrder(Root);
 
+    public ICollection<TValue> GetValuesPreOrder() => GetValuesPreOrder(Root);
 
-        public BinarySearchTree(TValue value)
+    public ICollection<TValue> GetValuesPostOrder() => GetValuesPostOrder(Root);
+
+    public bool IsValid()
+    {
+        if (this.Root is null)
         {
-            this.Value = value;
-            this.comparer = Comparer<TValue>.Default;
-        }
-
-        public BinarySearchTree(TValue value, Comparer<TValue> comparer)
-        {
-            this.Value = value;
-            this.comparer = comparer;
-        }
-
-        public BinarySearchTree<TValue> Insert(TValue value)
-        {
-            var currentNode = this;
-
-            while (currentNode != null)
-            {
-                var result = comparer.Compare(currentNode.Value, value);
-
-                if (result > 0)
-                {
-                    if (currentNode.Left == null)
-                    {
-                        currentNode.Left = new BinarySearchTree<TValue>(value);
-                        return this;
-                    }
-
-                    currentNode = currentNode.Left;
-                }
-                else
-                {
-                    if (currentNode.Right == null)
-                    {
-                        currentNode.Right = new BinarySearchTree<TValue>(value);
-                        return this;
-                    }
-
-                    currentNode = currentNode.Right;
-                }
-            }
-
-            return this;
-        }
-
-        public bool Contains(TValue value)
-        {
-            var currentNode = this;
-
-            while (currentNode != null)
-            {
-                var result = comparer.Compare(currentNode.Value, value);
-
-                if (result == 0)
-                {
-                    return true;
-                }
-
-                currentNode = result > 0 ? currentNode.Left : currentNode.Right;
-            }
-
             return false;
         }
 
-        public BinarySearchTree<TValue> Remove(TValue value, BinarySearchTree<TValue>? parent = null)
+        return IsValid(this.Root, (TValue) (object) int.MinValue, (TValue) (object) int.MaxValue);
+    }
+
+    public void Insert(TValue value)
+    {
+        if (Root is null)
         {
-            // Finding the node, parent node
-            var (node, parentNode) = this.ParentNodeAndNode(value);
+            Root = new BinarySearchTreeNode<TValue>(value);
+        }
+        else
+        {
+            Insert(Root, value);
+        }
+    }
 
-            if (node == null)
-            {
-                return this;
-            }
-
-            // Both nodes are there
-            if (node is { Left: not null, Right: not null })
-            {
-                node.Value = node.Right.GetMinValue();
-                node.Right.Remove(node.Value, parentNode);
-                return this;
-            }
-
-            // If it's root node
-            if (parentNode == null)
-            {
-                // Only left child
-                if (node.Left != null)
-                {
-                    node.Value = node.Left.Value;
-                    node.Right = node.Left.Right;
-                    node.Left = node.Left.Left;
-                }
-                // Only right child
-                else if (node.Right != null)
-                {
-                    node.Value = node.Right.Value;
-                    node.Left = node.Right.Left;
-                    node.Right = node.Right.Right;
-                }
-
-                return this;
-            }
-
-            // Left node
-            if (parentNode.Left == node)
-            {
-                parentNode.Left = node.Left ?? node.Right;
-                return this;
-            }
-
-            // Right Node
-            if (parentNode.Right == node)
-            {
-                parentNode.Right = node.Left ?? node.Right;
-                return this;
-            }
-
-            return this;
+    public bool Remove(TValue value)
+    {
+        if (Root is null)
+        {
+            return false;
         }
 
-        public bool IsValid()
+        return Remove(Root, Root, value);
+    }
+
+    public void AddRange(IEnumerable<TValue> values)
+    {
+        foreach (var value in values)
         {
-            // TODO: Find the best way to get the min, max values.
-            return IsValid(this, (TValue)(object)int.MinValue, (TValue)(object)int.MaxValue);
+            Insert(value);
+        }
+    }
+
+    private IList<TValue> GetValuesInOrder(BinarySearchTreeNode<TValue>? node)
+    {
+        if (node is null)
+        {
+            return new List<TValue>();
         }
 
-        public TValue FindClosestValueInBst(TValue target)
+        var result = new List<TValue>();
+        result.AddRange(GetValuesInOrder(node.Left));
+        result.Add(node.Value);
+        result.AddRange(GetValuesInOrder(node.Right));
+        return result;
+    }
+
+    private IList<TValue> GetValuesPreOrder(BinarySearchTreeNode<TValue>? node)
+    {
+        if (node is null)
         {
-            dynamic closetValue = this.Value!;
-
-            var currentNode = this;
-
-            while (currentNode is not null)
-            {
-                var result = comparer.Compare(currentNode.Value, target);
-
-                if (result == 0)
-                {
-                    return currentNode.Value;
-                }
-
-                dynamic currentNodeValue = currentNode.Value!;
-
-                if (Math.Abs(target - closetValue) > Math.Abs(target - currentNodeValue))
-                {
-                    closetValue = currentNode.Value!;
-                }
-
-                currentNode = result > 0 ? currentNode.Left : currentNode.Right;
-            }
-
-            return closetValue;
+            return new List<TValue>();
         }
 
-        public static IList<TValue> GetKeysInOrder(BinarySearchTree<TValue>? node)
-        {
-            if (node is null)
-            {
-                return new List<TValue>();
-            }
+        var result = new List<TValue> {node.Value};
+        result.AddRange(GetValuesPreOrder(node.Left));
+        result.AddRange(GetValuesPreOrder(node.Right));
+        return result;
+    }
 
-            var result = new List<TValue>();
-            result.AddRange(GetKeysInOrder(node.Left));
-            result.Add(node.Value);
-            result.AddRange(GetKeysInOrder(node.Right));
-            return result;
+    private IList<TValue> GetValuesPostOrder(BinarySearchTreeNode<TValue>? node)
+    {
+        if (node is null)
+        {
+            return new List<TValue>();
         }
 
-        public static IList<TValue> GetKeysPreOrder(BinarySearchTree<TValue>? node)
-        {
-            if (node is null)
-            {
-                return new List<TValue>();
-            }
+        var result = new List<TValue>();
+        result.AddRange(GetValuesPostOrder(node.Left));
+        result.AddRange(GetValuesPostOrder(node.Right));
+        result.Add(node.Value);
+        return result;
+    }
 
-            var result = new List<TValue>();
-            result.Add(node.Value);
-            result.AddRange(GetKeysPreOrder(node.Left));
-            result.AddRange(GetKeysPreOrder(node.Right));
-            return result;
+    private bool IsValid(BinarySearchTreeNode<TValue> node, TValue minValue, TValue maxValue)
+    {
+        var leftComparisonResult = comparer.Compare(node.Value, minValue);
+        var rightComparisonResult = comparer.Compare(node.Value, maxValue);
+
+        if (leftComparisonResult < 0 || rightComparisonResult >= 0)
+        {
+            return false;
         }
 
-        public static IList<TValue> GetKeysPostOrder(BinarySearchTree<TValue>? node)
+        if (node.Left != null && !IsValid(node.Left, minValue, node.Value))
         {
-            if (node is null)
-            {
-                return new List<TValue>();
-            }
-
-            var result = new List<TValue>();
-            result.AddRange(GetKeysPostOrder(node.Left));
-            result.AddRange(GetKeysPostOrder(node.Right));
-            result.Add(node.Value);
-            return result;
+            return false;
         }
 
-        private bool IsValid(BinarySearchTree<TValue> node, TValue minValue, TValue maxValue)
+        if (node.Right != null && !IsValid(node.Right, node.Value, maxValue))
         {
-            var leftComparisonResult = comparer.Compare(node.Value, minValue);
-            var rightComparisonResult = comparer.Compare(node.Value, maxValue);
-
-            if (leftComparisonResult < 0 || rightComparisonResult >= 0)
-            {
-                return false;
-            }
-
-            if (node.Left != null && !IsValid(node.Left, minValue, node.Value))
-            {
-                return false;
-            }
-
-            if (node.Right != null && !IsValid(node.Right, node.Value, maxValue))
-            {
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
+        return true;
+    }
 
-        private (BinarySearchTree<TValue>? node, BinarySearchTree<TValue>? parentNode) ParentNodeAndNode(TValue value)
+    private bool Remove(BinarySearchTreeNode<TValue>? parent, BinarySearchTreeNode<TValue>? node, TValue value)
+    {
+        if (parent is null || node is null)
         {
-            BinarySearchTree<TValue>? parentNode = null;
-
-            // ReSharper disable once SuggestVarOrType_SimpleTypes
-            BinarySearchTree<TValue>? currentNode = this;
-
-            while (currentNode != null)
-            {
-                var result = comparer.Compare(currentNode.Value, value);
-
-                if (result == 0)
-                {
-                    return (currentNode, parentNode);
-                }
-
-                parentNode = currentNode;
-                currentNode = result > 0 ? currentNode.Left : currentNode.Right;
-            }
-
-            return (null, null);
+            return false;
         }
 
-        private TValue GetMinValue()
+        var compareResult = comparer.Compare(node.Value, value);
+
+        if (compareResult > 0)
         {
-            var currentNode = this;
+            return Remove(node, node.Left, value);
+        }
 
-            while (currentNode.Left != null)
+        if (compareResult < 0)
+        {
+            return Remove(node, node.Right, value);
+        }
+
+        BinarySearchTreeNode<TValue>? replacementNode;
+
+        // Case 0: Node has no children
+        // Case 1: Node has one children
+        if (node.Left is null || node.Right is null)
+        {
+            replacementNode = node.Left ?? node.Right;
+        }
+
+        // Case 2: Node has two children.
+        else
+        {
+            var newParentNode = GetMin(node.Right);
+            Remove(Root, Root, newParentNode.Value);
+            replacementNode = new BinarySearchTreeNode<TValue>(newParentNode.Value)
             {
-                currentNode = currentNode.Left;
-            }
+                Left = node.Left,
+                Right = node.Right,
+            };
+        }
 
-            return currentNode.Value;
+        // Replace the node
+        if (node == Root)
+        {
+            Root = replacementNode;
+        }
+        else if (parent.Left == node)
+        {
+            parent.Left = replacementNode;
+        }
+
+        {
+            parent.Right = replacementNode;
+        }
+
+        return true;
+    }
+
+    private BinarySearchTreeNode<TValue>? Search(BinarySearchTreeNode<TValue>? node, TValue value)
+    {
+        if (node is null)
+        {
+            return default;
+        }
+
+        var compareResult = comparer.Compare(node.Value, value);
+
+        if (compareResult > 0)
+        {
+            return Search(node.Left, value);
+        }
+
+        if (compareResult < 0)
+        {
+            return Search(node.Right, value);
+        }
+
+        return node;
+    }
+
+    private BinarySearchTreeNode<TValue> GetMin(BinarySearchTreeNode<TValue> node)
+    {
+        return node.Left is null ? node : GetMin(node.Left);
+    }
+
+    private void Insert(BinarySearchTreeNode<TValue> node, TValue value)
+    {
+        var compareResult = comparer.Compare(node.Value, value);
+
+        if (compareResult > 0)
+        {
+            if (node.Left is null)
+            {
+                var newNode = new BinarySearchTreeNode<TValue>(value);
+                node.Left = newNode;
+            }
+            else
+            {
+                Insert(node.Left, value);
+            }
+        }
+        else
+        {
+            if (node.Right is null)
+            {
+                var newNode = new BinarySearchTreeNode<TValue>(value);
+                node.Right = newNode;
+            }
+            else
+            {
+                Insert(node.Right, value);
+            }
         }
     }
 }
