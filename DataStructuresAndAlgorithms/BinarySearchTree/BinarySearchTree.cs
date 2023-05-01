@@ -66,6 +66,48 @@ public class BinarySearchTree<TValue>
         }
     }
 
+    public void ConstructMinHeightTree(IList<TValue> values)
+    {
+        ConstructMinHeightTree(values, 0, values.Count - 1);
+    }
+
+    public int Height()
+    {
+        return Height(Root, 0);
+    }
+
+    private int Height(BinarySearchTreeNode<TValue>? node, int height)
+    {
+        if (node is null)
+        {
+            return height;
+        }
+
+        var leftSubTreeHeight = Height(node.Left, height + 1);
+        var rightSubTreeHeight = Height(node.Right, height + 1);
+
+        return Math.Max(leftSubTreeHeight, rightSubTreeHeight);
+    }
+
+    private BinarySearchTreeNode<TValue>? ConstructMinHeightTree(IList<TValue> values, int startIndex, int endIndex)
+    {
+        if (endIndex < startIndex)
+        {
+            return null;
+        }
+
+        var midIndex = (startIndex + endIndex) / 2;
+        var tree = new BinarySearchTreeNode<TValue>(values[midIndex]);
+
+        // Assign to root only if it's null
+        Root ??= tree;
+
+        tree.Left = ConstructMinHeightTree(values, startIndex, midIndex - 1);
+        tree.Right = ConstructMinHeightTree(values, midIndex + 1, endIndex);
+
+        return tree;
+    }
+
     private IList<TValue> GetValuesInOrder(BinarySearchTreeNode<TValue>? node)
     {
         if (node is null)

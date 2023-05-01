@@ -96,4 +96,15 @@ public class BinarySearchTreeNewTests
 
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void Construct_Min_height_Tree_Correctly()
+    {
+        var tree = new BinarySearchTree<int>();
+        tree.ConstructMinHeightTree(new List<int>() {1, 2, 5, 7, 10, 13, 14, 15, 22});
+
+        var actual = tree.Height();
+
+        Assert.That(actual, Is.EqualTo(4));
+    }
 }
