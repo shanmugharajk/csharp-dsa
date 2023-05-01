@@ -11,3 +11,6 @@ csharp-dsa.sln.DotSettings.user
 bin/
 obj/
 TestResults/
+
+# Scratch
+scratch
